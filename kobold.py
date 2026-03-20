@@ -9721,5 +9721,9 @@ except:
   m=traceback.format_exc().split("\n")
   console_print(m)
   
-clive.loop.create_task(main_loop())
-clive.run(TOKEN)
+async def main():
+    async with clive:
+        clive.loop.create_task(main_loop())
+        await clive.start(TOKEN)
+
+asyncio.run(main())
