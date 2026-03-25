@@ -9337,14 +9337,31 @@ async def cmd_verify(words,member,chan,w):
 @clive.event
 async def on_ready():
   global guild
+  print(f'Bot connected. Guilds: {[g.name for g in clive.guilds]}')
   for g in clive.guilds:
         if g.name == GUILDN:
             guild = g
             break
+  if guild is None and clive.guilds:
+    guild = clive.guilds[0]
+    print(f'GUILDN "{GUILDN}" not matched, falling back to: {guild.name}')
+  if guild is None:
+    print('ERROR: Bot is not in any guild.')
+    return
   console_print(
     f'{clive.user} is connected to the following guild:\n'
     f'{guild.name}(id: {guild.id})'
   )
+  required_channels = ["general", "verify", "console", "exception-log"]
+  existing = [c.name for c in guild.text_channels]
+  print(f'Existing channels: {existing}')
+  for ch in required_channels:
+    if ch not in existing:
+      try:
+        await guild.create_text_channel(ch)
+        print(f'Created missing channel: #{ch}')
+      except Exception as e:
+        print(f'ERROR creating #{ch}: {e}')
   game = discord.Game("Kobold Legacy")
   await clive.change_presence(activity=game)
   
